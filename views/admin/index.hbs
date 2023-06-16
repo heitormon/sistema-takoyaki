@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.min.js"></script>
+    <meta charset="utf-8" />
+    <title>Admin</title>
+</head>
+
+<body>
+    <div class="container mx-auto p-2">
+        <div class="mb-3">
+            <form class="row g-3 needs-validation" novalidate>
+                <div class="input-group">
+                    <input type="number" class="form-control" placeholder="Numero Pedido"
+                        aria-label="Recipient's username with two button addons" id="pedidoInput" autofocus required>
+                    <button class="btn btn-primary" type="submit">Confirmar</button>
+                </div>
+            </form>
+        </div>
+        <div class="mb-3">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="fs-1 text-start bg-secondary text-white">Preparando</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="fs-1 text-start bg-danger text-white">Pronto</div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="row row-gap-3">
+                        {{#each preparando}}
+                        <div class="col-sm-6 fs-1 text-end">{{this}}</div>
+                        <button type="button" onclick="update('cancelar',{{this}})" class="p-2 col-sm-2 btn btn-warning">Cancelar</button>
+                        <button type="button" onclick="update('pronto',{{this}})" class="p-2 col-sm-2 btn btn-success">Pronto</button>
+                        {{/each}}
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="row row-gap-3">
+                        {{#each pronto}}
+                        <div class="col-sm-6 fs-1 text-end">{{this}}</div>
+                        <button type="button" onclick="update('finalizar',{{this}})"
+                            class="col-sm-2 btn btn-success">Finalizar</button>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    (function () {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    } else {
+                        let value = $('#pedidoInput').val()
+                        $.ajax({
+                            url: '/pedido',
+                            data: JSON.stringify({ pedido: value }),
+                            processData: false,
+                            contentType: 'application/json',
+                            type: 'POST',
+                            success: function (data) {
+                                alert(data)
+                            },
+                        })
+                    }
+
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+    function update(action,pedido) {
+        $.ajax({
+            url: `/pedido/${action}/${pedido}`,
+            processData: false,
+            type: 'PUT',
+            success: function (data) {
+                window.location.reload();
+            },
+        })
+    }
+</script>
+
+</html>
