@@ -16,14 +16,15 @@ export class AppService {
     data.pronto.push(pedido);
   }
   savePedido(pedido: { pedido: string }) {
+    let numero = +pedido.pedido
     if (
-      data.preparando.includes(pedido.pedido) ||
-      data.pronto.includes(pedido.pedido)
+      data.preparando.includes(numero) ||
+      data.pronto.includes(numero)
     ) {
       return 'Pedido ja existente!!!';
     }
-    data.preparando.push(`${pedido.pedido}`);
-    return `Pedido registrado ${pedido.pedido}`;
+    data.preparando.push(numero);
+    return `Pedido registrado ${numero}`;
   }
   readPedidos(): { pronto: [string]; preparando: [string] } {
     return data;
