@@ -27,17 +27,19 @@
         <div class="mb-3">
             <div class="row">
                 <div class="col-sm-6">
-                    <div class="fs-1 text-start bg-secondary text-white">Preparando</div>
+                    <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="fs-1 text-start bg-danger text-white">Pronto</div>
+                    <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
                 </div>
                 <div class="col-sm-6">
                     <div class="row row-gap-3">
                         {{#each preparando}}
                         <div class="col-sm-6 fs-1 text-end">{{this}}</div>
-                        <button type="button" onclick="update('cancelar',{{this}})" class="p-2 col-sm-2 btn btn-warning">Cancelar</button>
-                        <button type="button" onclick="update('pronto',{{this}})" class="p-2 col-sm-2 btn btn-success">Pronto</button>
+                        <button type="button" onclick="update('cancelar',{{this}})"
+                            class="p-2 col-sm-2 btn btn-warning">Cancelar</button>
+                        <button type="button" onclick="update('pronto',{{this}})"
+                            class="p-2 col-sm-2 btn btn-success">Pronto</button>
                         {{/each}}
                     </div>
                 </div>
@@ -55,10 +57,10 @@
     </div>
 </body>
 <script>
+    const audio = new Audio('som.mp3');
     (function () {
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         var forms = document.querySelectorAll('.needs-validation')
-
         // Loop over them and prevent submission
         Array.prototype.slice.call(forms)
             .forEach(function (form) {
@@ -75,23 +77,28 @@
                             contentType: 'application/json',
                             type: 'POST',
                             success: function (data) {
-                                alert(data)
+                                console.log(data)
                             },
                         })
                     }
-
-
                     form.classList.add('was-validated')
                 }, false)
             })
     })()
-    function update(action,pedido) {
+    async function update(action, pedido) {
         $.ajax({
             url: `/pedido/${action}/${pedido}`,
             processData: false,
             type: 'PUT',
             success: function (data) {
-                window.location.reload();
+                if (action == "pronto") {
+                    audio.play();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, "800");
+                } else {
+                    window.location.reload();
+                }
             },
         })
     }

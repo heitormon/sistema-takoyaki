@@ -5,10 +5,9 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {
   }
-  @Get()
+  @Get('painel')
   @Render('painel')
   root() {
-    console.log(this.appService.readPedidos())
     return this.appService.readPedidos();
   }
   @Get('admin')

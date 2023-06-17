@@ -13,10 +13,10 @@
 <body>
     <div class="row">
         <div class="col-sm-6">
-            <div class="fs-1 text-start bg-secondary text-white">Preparando</div>
+            <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
         </div>
         <div class="col-sm-6">
-            <div class="fs-1 text-start bg-danger text-white">Pronto</div>
+            <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
         </div>
     </div>
     <div class="row" id="pedidos">
@@ -32,7 +32,6 @@
     loadPedidos(pronto);
     function loadPedidos(pedido) {
         const numRow = 6;
-        console.log(pedido)
         if (pedido.length == 0) {
             $("#pedidos").append(`<div class="col-sm-6"></div>` );
         } else {
@@ -43,7 +42,6 @@
                 let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
                 let str = "";
                 for (let j = i * numRow; j < size; j++) {
-                    console.log(pedido[j])
                     str += `<div class="h1 text-start">${pedido[j]}</div>`
                 }
                 $("#pedidos").append(`<div class="col-sm-${smPedido}">
