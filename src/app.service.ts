@@ -13,20 +13,20 @@ export class AppService {
   }
   prontoPedido(pedido: string) {
     this.remove(data.preparando, +pedido);
-    data.pronto.push(+pedido);
+    this.add(data.pronto,+pedido);
   }
   savePedido(pedido: { pedido: string }) {
     let numero = +pedido.pedido;
     if (data.preparando.includes(numero) || data.pronto.includes(numero)) {
       return 'Pedido ja existente!!!';
     }
-    data.preparando.push(numero);
+    this.add(data.preparando,+numero);
     return `Pedido registrado ${numero}`;
   }
   readPedidos(): { pronto: [string]; preparando: [string] } {
     return data;
   }
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
     fs.writeFile('./data.json', JSON.stringify(data), (err) => {
       if (err) {
@@ -38,6 +38,12 @@ export class AppService {
     const index = list.indexOf(pedido);
     if (index > -1) {
       list.splice(index, 1);
+    }
+  }
+  private add(list: [number], pedido: number) {
+    const index = list.indexOf(pedido);
+    if (index === -1) {
+      list.push(pedido);
     }
   }
 }
