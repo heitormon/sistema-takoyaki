@@ -1,7 +1,6 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PedidoDto } from './pedido.dto';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 const data: {
   pronto: PedidoDto[];
   preparando: PedidoDto[];

@@ -48,4 +48,8 @@ export class AppController {
   finalizar(@Body() pedido:  {numero: string}) {
     return this.appService.finalizarPedido(pedido.numero);
   }
+  @Get('pedidos')
+  pedidos() {
+    return this.appService.readPedidos();
+  }
 }
