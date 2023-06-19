@@ -1,34 +1,51 @@
-import { Get, Controller, Render, Post, Body, Put, Param } from '@nestjs/common';
+import {
+  Get,
+  Controller,
+  Render,
+  Post,
+  Body,
+  Put,
+  Param,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import { PedidoDto } from './pedido.dto';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {
-  }
+  constructor(private readonly appService: AppService) {}
   @Get('painel')
   @Render('painel')
-  root() {
+  painel() {
+    const pedidos = this.appService.readPedidos();
+    return {
+      pronto: JSON.stringify(pedidos.pronto),
+      preparando: JSON.stringify(pedidos.preparando),
+    };
+  }
+  @Get('caixa')
+  @Render('caixa')
+  caixa() {
     return this.appService.readPedidos();
   }
-  @Get('admin')
-  @Render('admin')
-  admin() {
+  @Get('entrega')
+  @Render('entrega')
+  entrega() {
     return this.appService.readPedidos();
   }
   @Post('pedido')
-  pedido(@Body() pedido: {pedido: string}) {
+  pedido(@Body() pedido: PedidoDto) {
     return this.appService.savePedido(pedido);
   }
-  @Put('pedido/pronto/:pedido')
-  pronto(@Param('pedido') pedido: string) {
-    return this.appService.prontoPedido(pedido);
+  @Put('pedido/pronto')
+  pronto(@Body() pedido: {numero: string}) {
+    return this.appService.prontoPedido(pedido.numero);
   }
-  @Put('pedido/cancelar/:pedido')
-  cancelar(@Param('pedido') pedido: string) {
-    return this.appService.cancelarPedido(pedido);
+  @Put('pedido/cancelar')
+  cancelar(@Body() pedido:  {numero: string}) {
+    return this.appService.cancelarPedido(pedido.numero);
   }
-  @Put('pedido/finalizar/:pedido')
-  finalizar(@Param('pedido') pedido: string) {
-    return this.appService.finalizarPedido(pedido);
+  @Put('pedido/finalizar')
+  finalizar(@Body() pedido:  {numero: string}) {
+    return this.appService.finalizarPedido(pedido.numero);
   }
 }

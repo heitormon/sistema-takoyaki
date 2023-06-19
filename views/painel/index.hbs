@@ -7,7 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.7.0.slim.js"
         integrity="sha256-7GO+jepT9gJe9LB4XFf8snVOjX3iYNb0FHYr5LI1N5c=" crossorigin="anonymous"></script>
     <meta charset="utf-8" />
-    <title>Painel</title>
+    <title>painel</title>
 </head>
 
 <body>
@@ -26,14 +26,14 @@
     setTimeout(() => {
         window.location.reload();
     }, "1000");
-    const pronto = [{{ pronto }}];
-    const preparando = [{{ preparando }}];
+    const pronto = {{{ pronto }}};
+    const preparando = {{{ preparando }}};
     loadPedidos(preparando);
     loadPedidos(pronto);
     function loadPedidos(pedido) {
         const numRow = 6;
         if (pedido.length == 0) {
-            $("#pedidos").append(`<div class="col-sm-6"></div>` );
+            $("#pedidos").append(`<div class="col-sm-6"></div>`);
         } else {
             const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 1);
             const colNumber = Math.min(Math.ceil(pedido.length / numRow), 6);
@@ -42,7 +42,8 @@
                 let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
                 let str = "";
                 for (let j = i * numRow; j < size; j++) {
-                    str += `<div class="h1 text-start">${pedido[j]}</div>`
+                    const viagem = pedido[j].viagem ? "🚗" : "🍽️";
+                    str += `<div class="h1 text-start">${viagem} ${pedido[j].numero}</div>`
                 }
                 $("#pedidos").append(`<div class="col-sm-${smPedido}">
             ${str}

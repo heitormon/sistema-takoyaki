@@ -1,29 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-const data = require('../data.json');
+import { PedidoDto } from './pedido.dto';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+const data: {
+  pronto: PedidoDto[];
+  preparando: PedidoDto[];
+} = require('../data.json');
 const fs = require('fs');
 
 @Injectable()
 export class AppService {
   finalizarPedido(pedido: string) {
-    this.remove(data.pronto, +pedido);
+    this.remove(data.pronto, pedido);
   }
   cancelarPedido(pedido: string) {
-    this.remove(data.preparando, +pedido);
+    this.remove(data.preparando, pedido);
   }
   prontoPedido(pedido: string) {
-    this.remove(data.preparando, +pedido);
-    this.add(data.pronto,+pedido);
+    let pedidoDto = this.find(data.preparando, pedido);
+    this.remove(data.preparando, pedido);
+    this.add(data.pronto, pedidoDto);
   }
-  savePedido(pedido: { pedido: string }) {
-    let numero = +pedido.pedido;
-    if (data.preparando.includes(numero) || data.pronto.includes(numero)) {
-      return 'Pedido ja existente!!!';
+  savePedido(pedido: PedidoDto) {
+    let numero = pedido.numero;
+    if (
+      this.isPresent(data.preparando, numero) ||
+      this.isPresent(data.pronto, numero)
+    ) {
+      throw new BadRequestException('Pedido ja existente!!!');
     }
-    this.add(data.preparando,+numero);
-    return `Pedido registrado ${numero}`;
+    this.add(data.preparando, pedido);
   }
-  readPedidos(): { pronto: [string]; preparando: [string] } {
+  readPedidos(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
     return data;
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
@@ -34,16 +42,29 @@ export class AppService {
       }
     });
   }
-  private remove(list: [number], pedido: number) {
-    const index = list.indexOf(pedido);
-    if (index > -1) {
-      list.splice(index, 1);
+  private remove(list: PedidoDto[], pedido: string): void {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].numero === pedido) {
+        list.splice(i, 1);
+      }
     }
   }
-  private add(list: [number], pedido: number) {
-    const index = list.indexOf(pedido);
-    if (index === -1) {
+  private add(list: PedidoDto[], pedido: PedidoDto): void {
+    if (!this.isPresent(list, pedido.numero)) {
       list.push(pedido);
     }
+  }
+  private isPresent(list: PedidoDto[], pedido: string): boolean {
+    const index = list.find((e) => {
+      return e.numero === pedido;
+    });
+    return index ? true : false;
+  }
+
+  private find(list: PedidoDto[], pedido: string): PedidoDto {
+    const index = list.find((e) => {
+      return e.numero === pedido;
+    });
+    return index;
   }
 }
