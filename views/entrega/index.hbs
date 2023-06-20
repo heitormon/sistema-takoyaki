@@ -24,44 +24,15 @@
                     <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
                 </div>
                 <div class="col-sm-6" id="preparando">
-                    {{!-- {{#each preparando}}
-                    <div class="d-flex align-items-center border bg-info">
-                        <div class="col-sm-1 fs-2 text-center">
-                            {{#if this.viagem}}
-                            🚗
-                            {{else}}
-                            🍽️
-                            {{/if}}
-                        </div>
-                        <div class="col-sm-3 fs-3 text-center">{{this.descricao}}</div>
-                        <div class="col-sm-5 fs-1 text-center">{{this.numero}}</div>
-                        <button type="button" onclick="update('pronto','{{this.numero}}')"
-                            class="p-2 col-sm-2 btn btn-success">Pronto</button>
-                    </div>
-                    {{/each}} --}}
                 </div>
                 <div class="col-sm-6" id="pronto">
-                    {{!-- {{#each pronto}}
-                    <div class="d-flex align-items-center border  bg-info">
-                        <div class="col-sm-3 fs-2 text-center">
-                            {{#if this.viagem}}
-                            🚗
-                            {{else}}
-                            🍽️
-                            {{/if}}
-                        </div>
-                        <div class="col-sm-3 fs-2 text-center">{{this.descricao}}</div>
-                        <div class="col-sm-3 fs-1 text-center">{{this.numero}}</div>
-                        <button type="button" onclick="update('finalizar','{{this.numero}}')"
-                            class="col-sm-2 btn btn-success">Finalizar</button>
-                    </div>
-                    {{/each}} --}}
                 </div>
             </div>
         </div>
     </div>
 </body>
 <script>
+    load();
     setInterval(function () { load() }, 1000);
     function update(action, pedido) {
         $.ajax({
@@ -88,30 +59,23 @@
         loadPedidos(data.preparando, 'preparando')
     }
     function loadPedidos(pedido, tipo) {
-        const numRow = 6;
         $(`#${tipo}`).children().remove();
         if (pedido.length == 0) {
             $(`#${tipo}`).append(`<div class="col-sm-6"></div>`);
         } else {
-            const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 1);
-            const colNumber = Math.min(Math.ceil(pedido.length / numRow), 6);
-            const more = Math.ceil(pedido.length / numRow) > 6;
-            for (let i = 0; i < colNumber; i++) {
-                let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
+            for (let i = 0; i < pedido.length; i++) {
                 let str = "";
-                for (let j = i * numRow; j < size; j++) {
-                    const viagem = pedido[j].viagem ? "🚗" : "🍽️";
-                    const operacao = tipo === 'pronto' ? "finalizar" : "pronto";
-                    str += `<div class="pedidos d-flex align-items-center border bg-info">
+                const viagem = pedido[i].viagem ? "🚗" : "🍽️";
+                const operacao = tipo === 'pronto' ? "finalizar" : "pronto";
+                str += `<div class="pedidos d-flex align-items-center border bg-info">
                         <div class="col-sm-3 fs-2 text-center">
                             ${viagem}
                         </div>
-                        <div class="col-sm-2 fs-2 text-center">${pedido[j].descricao}</div>
-                        <div class="col-sm-5 fs-1 text-center">${pedido[j].numero}</div>
-                        <button type="button" onclick="update('${operacao}','${pedido[j].numero}')"
+                        <div class="col-sm-2 fs-2 text-center">${pedido[i].descricao}</div>
+                        <div class="col-sm-5 fs-1 text-center">${pedido[i].numero}</div>
+                        <button type="button" onclick="update('${operacao}','${pedido[i].numero}')"
                             class="col-sm-2 btn btn-success">${operacao}</button>
                     </div>`
-                }
                 $(`#${tipo}`).append(` ${str}`);
             }
         }

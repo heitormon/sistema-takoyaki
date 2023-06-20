@@ -59,12 +59,12 @@
                             <div class="fs-1 text-center bg-secondary text-white">🐙 Preparando</div>
                         </div>
                         <div class="col-sm-12">
-                            <div class="row row-gap-3">
-                                {{#each preparando}}
+                            <div class="row row-gap-3" id="pedido">
+                                {{!-- {{#each preparando}}
                                 <div class="col-sm-6 fs-1 text-end">{{this.numero}}</div>
                                 <button type="button" onclick="update('cancelar','{{this.numero}}')"
                                     class="p-2 col-sm-2 btn btn-warning">Cancelar</button>
-                                {{/each}}
+                                {{/each}} --}}
                             </div>
                         </div>
                     </div>
@@ -74,6 +74,8 @@
     </div>
 </body>
 <script>
+    load()
+    setInterval(function () { load() }, 1000);
     (function () {
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         var forms = document.querySelectorAll('.needs-validation')
@@ -111,10 +113,37 @@
             data: JSON.stringify({ numero: pedido }),
             processData: false,
             contentType: 'application/json',
+        })
+    }
+    function load() {
+        $.ajax({
+            url: `/pedidos`,
+            type: 'GET',
+            contentType: 'application/json',
             success: function (data) {
-                window.location.reload();
+                loadPedidos(data.preparando);
             },
         })
     }
+    function loadPedidos(pedido, tipo) {
+        $(`#pedido`).children().remove();
+        if (pedido.length == 0) {
+            $(`#pedido`).append(`<div class="col-sm-6"></div>`);
+        } else {
+            for (let i = 0; i < pedido.length; i++) {
+                let str = "";
+                const viagem = pedido[i].viagem ? "🚗" : "🍽️";
+                str += ` <div class="col-sm-3 fs-2 text-center">
+                            ${viagem}
+                        </div>
+                        <div class="col-sm-2 fs-2 text-center">${pedido[i].descricao}</div>
+                        <div class="col-sm-3 fs-1 text-center">${pedido[i].numero}</div>
+                        <button type="button" onclick="update('cancelar','${pedido[i].numero}')"
+                            class="col-sm-2 btn btn-warning">Cancelar</button>`
+                $(`#pedido`).append(` ${str}`);
+            }
+        }
+    }
 </script>
+
 </html>

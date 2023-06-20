@@ -31,7 +31,7 @@
     loadPedidos(preparando);
     loadPedidos(pronto);
     function loadPedidos(pedido) {
-        const numRow = 6;
+        const numRow = 10;
         if (pedido.length == 0) {
             $("#pedidos").append(`<div class="col-sm-6"></div>`);
         } else {
@@ -45,11 +45,10 @@
                     const viagem = pedido[j].viagem ? "🚗" : "🍽️";
                     str += `<div class="h1 text-start">${viagem} ${pedido[j].numero}</div>`
                 }
-                $("#pedidos").append(`<div class="col-sm-${smPedido}">
-            ${str}
-        </div>` );
+                $("#pedidos").append(`<div class="col-sm-${smPedido}">${str}</div>`);
             }
         }
+
     }
 </script>
 
