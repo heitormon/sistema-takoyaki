@@ -1,11 +1,8 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PedidoDto } from './pedido.dto';
-const data: {
-  pronto: PedidoDto[];
-  preparando: PedidoDto[];
-} = require('../data.json');
-const fs = require('fs');
+const data = require('../data/data.json');
+import * as fs from 'fs';
 
 @Injectable()
 export class AppService {
@@ -35,7 +32,7 @@ export class AppService {
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
-    fs.writeFile('./data.json', JSON.stringify(data), (err) => {
+    fs.writeFile('./data/data.json', JSON.stringify(data), (err) => {
       if (err) {
         console.log('Error writing file', err);
       }
