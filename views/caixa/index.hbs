@@ -20,11 +20,11 @@
                     <div class="row align-items-center">
                         <div class="col-6 mb-3">
                             <input type="text" class="form-control form-control-lg" placeholder="Numero Pedido"
-                                id="numeroInput" required>
+                                id="numeroInput" autocomplete="off" required>
                         </div>
                         <div class="col-6 mb-3">
                             <input type="text" class="form-control form-control-lg" placeholder="Descrição Pedido"
-                                id="descricaoInput">
+                                id="descricaoInput" autocomplete="off">
                         </div>
                         <div class="col-6">
                             <div class="form-check text-start">
@@ -56,11 +56,6 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="row row-gap-3" id="pedido">
-                                {{!-- {{#each preparando}}
-                                <div class="col-sm-6 fs-1 text-end">{{this.numero}}</div>
-                                <button type="button" onclick="update('cancelar','{{this.numero}}')"
-                                    class="p-2 col-sm-2 btn btn-warning">Cancelar</button>
-                                {{/each}} --}}
                             </div>
                         </div>
                     </div>
@@ -73,9 +68,7 @@
     load()
     setInterval(function () { load() }, 1000);
     (function () {
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
         var forms = document.querySelectorAll('.needs-validation')
-        // Loop over them and prevent submission
         Array.prototype.slice.call(forms)
             .forEach(function (form) {
                 form.addEventListener('submit', function (event) {
