@@ -5,7 +5,6 @@ import {
   Post,
   Body,
   Put,
-  Param,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PedidoDto } from './pedido.dto';
@@ -37,15 +36,15 @@ export class AppController {
     return this.appService.savePedido(pedido);
   }
   @Put('pedido/pronto')
-  pronto(@Body() pedido: {numero: string}) {
+  pronto(@Body() pedido: {numero: number}) {
     return this.appService.prontoPedido(pedido.numero);
   }
   @Put('pedido/cancelar')
-  cancelar(@Body() pedido:  {numero: string}) {
+  cancelar(@Body() pedido:  {numero: number}) {
     return this.appService.cancelarPedido(pedido.numero);
   }
   @Put('pedido/finalizar')
-  finalizar(@Body() pedido:  {numero: string}) {
+  finalizar(@Body() pedido:  {numero: number}) {
     return this.appService.finalizarPedido(pedido.numero);
   }
   @Get('pedidos')

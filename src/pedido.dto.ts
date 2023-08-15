@@ -1,5 +1,8 @@
 export class PedidoDto {
-  numero: string;
+  numero: number;
   descricao: string;
   viagem: boolean;
+  quantidade: number;
+  preferencial: boolean;
+  refeicao: boolean
 }

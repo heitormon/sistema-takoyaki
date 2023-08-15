@@ -4,6 +4,7 @@
 <head>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket/socket.io.min.js"></script>
     <script src="/jquery-3.7.0.min.js"></script>
     <meta charset="utf-8" />
     <title>caixa</title>
@@ -11,40 +12,57 @@
 
 <body>
     <div class="container-fluid">
-        <div class="card text-center">
+        <div class="h-50 p-3 card text-center">
             <div class="card-header">
-                <h5 class="card-title">CAIXA 🛒</h5>
+                <h1 class="card-title display-4">CAIXA 🛒</h1>
             </div>
             <div class="card-body">
                 <form class="needs-validation" novalidate>
                     <div class="row align-items-center">
-                        <div class="col-6 mb-3">
-                            <input type="text" class="form-control form-control-lg" placeholder="Numero Pedido"
+                        <div class="col-md-6 mb-3">
+                            <input type="tel" class="form-control form-control-lg" placeholder="Numero Pedido"
                                 id="numeroInput" autocomplete="off" required>
                         </div>
-                        <div class="col-6 mb-3">
-                            <input type="text" class="form-control form-control-lg" placeholder="Descrição Pedido"
-                                id="descricaoInput" autocomplete="off">
+                        <div class="col-md-4 mb-3">
+                            <input type="number" class="form-control form-control-lg" placeholder="Quantidade"
+                                id="quantidadeInput" autocomplete="off" value=1 required>
                         </div>
-                        <div class="col-6">
-                            <div class="form-check text-start">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault1" value="true">
-                                <label class="form-check-label" for="flexRadioDefault1">
-                                    Viagem
-                                </label>
-                            </div>
-                            <div class="form-check text-start">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                    id="flexRadioDefault2" value="false" checked>
-                                <label class="form-check-label " for="flexRadioDefault2">
-                                    Comer aqui
-                                </label>
+                        <div class="col-md-12 mb-3">
+                            <div class="form-floating">
+                                <textarea type="text" class="form-control" style="height: 100px" id="descricaoInput"
+                                    autocomplete="off"> </textarea>
+                                <label for="descricaoInput">Descrição do Pedido</label>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <button class="btn btn-primary" type="submit">Submit form</button>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="d-grid gap-2 col-6 mx-auto">
+                            <input class="btn-check form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                                value="true">
+                            <label class="btn btn-outline-success" for="flexRadioDefault1">
+                                <h1 class="display-5">Viagem</h1>
+                            </label>
+                            <input class="btn-check form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                                value="false" checked>
+                            <label class="btn btn-outline-success" for="flexRadioDefault2">
+                                <h1 class="display-5">Comer Aqui</h1>
+                            </label>
                         </div>
+                        <div class="d-grid gap-2 col-6 mx-auto">
+                            <input type="checkbox" class="btn-check" id="checkPrefencial" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="checkPrefencial">
+                                <h1 class="display-5">Preferêncial</h1>
+                            </label>
+
+                            <input type="checkbox" class="btn-check" id="checkRefeicao" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="checkRefeicao">
+                                <h1 class="display-5">Vale Refeição</h1>
+                        </div>
+                    </div>
+                    <div class="mt-auto p-2 row align-items-center">
+                        <button class="btn btn-lg btn-block btn-primary" type="submit">
+                            <h1 class="display-5">ENVIAR</h1>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -65,8 +83,9 @@
     </div>
 </body>
 <script>
-    load()
-    setInterval(function () { load() }, 1000);
+    const socket = io('http://localhost:3000');
+    socket.on('connection', data =>load() );
+    socket.on('all', data => load());
     (function () {
         var forms = document.querySelectorAll('.needs-validation')
         Array.prototype.slice.call(forms)
@@ -76,12 +95,15 @@
                         event.preventDefault()
                         event.stopPropagation()
                     } else {
-                        let numero = $('#numeroInput').val();
+                        let numero = parseInt($('#numeroInput').val());
                         let viagem = document.querySelector('.form-check-input').checked;
                         let descricao = $('#descricaoInput').val();
+                        let quantidade = parseInt($('#quantidadeInput').val());
+                        let preferencial = $('#checkPrefencial').is(":checked");
+                        let refeicao = $('#checkRefeicao').is(":checked");
                         $.ajax({
                             url: '/pedido',
-                            data: JSON.stringify({ numero, viagem, descricao }),
+                            data: JSON.stringify({ numero, viagem, descricao, quantidade, preferencial, refeicao }),
                             processData: false,
                             contentType: 'application/json',
                             type: 'POST',
@@ -122,13 +144,13 @@
             for (let i = 0; i < pedido.length; i++) {
                 let str = "";
                 const viagem = pedido[i].viagem ? "🚗" : "🍽️";
-                str += ` <div class="col-sm-3 fs-2 text-center">
+                str += `<div class="col-sm-3 fs-2 text-center">
                             ${viagem}
                         </div>
                         <div class="col-sm-2 fs-2 text-center">${pedido[i].descricao}</div>
                         <div class="col-sm-3 fs-1 text-center">${pedido[i].numero}</div>
                         <button type="button" onclick="update('cancelar','${pedido[i].numero}')"
-                            class="col-sm-2 btn btn-warning">Cancelar</button>`
+                            class="col-sm-2 mb-2 btn btn-warning">Cancelar</button>`
                 $(`#pedido`).append(` ${str}`);
             }
         }
