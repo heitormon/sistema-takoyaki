@@ -38,8 +38,6 @@ export class AppService {
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
-    console.log('WRITE FILE');
-    console.log(JSON.stringify(data));
     fs.writeFileSync('./data/data.json', JSON.stringify(data));
   }
   private remove(list: PedidoDto[], pedido: number): void {
