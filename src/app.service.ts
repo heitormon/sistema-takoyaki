@@ -1,9 +1,9 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PedidoDto } from './pedido.dto';
-const data = require('../data/data.json');
 import * as fs from 'fs';
 import { AppGateway } from './app.gateway';
+const data: { pronto: PedidoDto[]; preparando: PedidoDto[] } = readFile();
 
 @Injectable()
 export class AppService {
@@ -38,11 +38,9 @@ export class AppService {
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
-    fs.writeFile('./data/data.json', JSON.stringify(data), (err) => {
-      if (err) {
-        console.log('Error writing file', err);
-      }
-    });
+    console.log('WRITE FILE');
+    console.log(JSON.stringify(data));
+    fs.writeFileSync('./data/data.json', JSON.stringify(data));
   }
   private remove(list: PedidoDto[], pedido: number): void {
     for (var i = 0; i < list.length; i++) {
@@ -70,5 +68,16 @@ export class AppService {
       return e.numero == pedido;
     });
     return index;
+  }
+}
+function readFile(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
+  if (fs.existsSync('./data/data.json')) {
+    const buffer = fs.readFileSync('./data/data.json');
+    return JSON.parse(buffer.toString());
+  } else {
+    return {
+      pronto: [],
+      preparando: [],
+    };
   }
 }
