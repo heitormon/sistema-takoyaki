@@ -1,0 +1,65 @@
+<div class="modal top fade" id="pedidoModal">
+    <div class="modal-dialog modal-fullscreen-xxl-down modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Pedido Pronto</h1>
+            </div>
+            <div class="modal-body" id="modalMessage">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
+    </div>
+    <div class="col-sm-6">
+        <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
+    </div>
+</div>
+<div class="row" id="pedidos">
+</div>
+<script>
+    const socket = io('http://localhost:3000');
+    let localDate = new Date();
+    socket.on('connection', e => load());
+    socket.on('all', e => load());
+    socket.on('pronto', data => {
+        console.log(data)
+        let numero = parseNumero(data);
+        $(`#modalMessage`).children().remove();
+        $('#modalMessage').append(`<div class="text-center fs-1">${numero}</div>`);
+        $('#pedidoModal').modal('show');
+        setTimeout(() => { $('#pedidoModal').modal('hide'); }, 5000);
+    });
+
+    async function load() {
+        const pedidos = await fetchPedidos();
+        console.log('load pedidos')
+        $(`#pedidos`).children().remove();
+        loadPedidos(pedidos.preparando);
+        loadPedidos(pedidos.pronto);
+    }
+
+    function loadPedidos(pedido) {
+        const numRow = 6;
+        if (pedido.length == 0) {
+            $("#pedidos").append(`<div class="col-sm-6"></div>`);
+        } else {
+            const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 2);
+            const colNumber = Math.min(Math.ceil(pedido.length / numRow), 3);
+            console.log(colNumber)
+            for (let i = 0; i < colNumber; i++) {
+                let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
+                let str = "";
+                for (let j = i * numRow; j < size; j++) {
+                    const viagem = parseViagem(pedido[j]);
+                    let numero = parseNumero(pedido[j])
+                    str += `<div class="h1 text-start">${viagem} ${numero}</div>`
+                }
+                $("#pedidos").append(`<div class="col-sm-${smPedido}">${str}</div>`);
+            }
+        }
+
+    }
+</script>

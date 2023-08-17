@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket/socket.io.min.js"></script>
+    <script src="/jquery-3.7.0.min.js"></script>
+    <meta charset="utf-8" />
+
+</head>
+<script>
+    async function fetchPedidos() {
+        return new Promise((resolve) => {
+            $.ajax({
+                url: `/pedidos`,
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (data) {
+                    resolve(data);
+                },
+            })
+        })
+    }
+    function sendPedido(pedido) {
+        new Promise((resolve) => {
+            $.ajax({
+                url: '/pedido',
+                data: JSON.stringify(pedido),
+                processData: false,
+                contentType: 'application/json',
+                type: 'POST',
+                error: function (error) {
+                    alert('Pedido ja registrado')
+                }, success: function (data) {
+                    resolve(data)
+                }
+            })
+        })
+    }
+    function parseViagem(pedido) {
+        return pedido.viagem ? "🚗" : "🍽️";
+    }
+    function parseNumero(pedido) {
+        return pedido.quantidade > 1 ? `${pedido.numero} - ${pedido.numero + pedido.quantidade - 1}` : `${pedido.numero}`;
+    }
+</script>
+
+<body>
+    {{{body}}}
+</body>
+
+
+</html>
