@@ -20,22 +20,19 @@
 <div class="row" id="pedidos">
 </div>
 <script>
-    const socket = io('http://localhost:3000');
+    const socket = io();
     let localDate = new Date();
     socket.on('connection', e => load());
     socket.on('all', e => load());
     socket.on('pronto', data => {
-        console.log(data)
         let numero = parseNumero(data);
         $(`#modalMessage`).children().remove();
-        $('#modalMessage').append(`<div class="text-center fs-1">${numero}</div>`);
+        $('#modalMessage').append(`<div class="text-center" style="font-size:20vw;">${numero}</div>`);
         $('#pedidoModal').modal('show');
         setTimeout(() => { $('#pedidoModal').modal('hide'); }, 5000);
     });
-
     async function load() {
         const pedidos = await fetchPedidos();
-        console.log('load pedidos')
         $(`#pedidos`).children().remove();
         loadPedidos(pedidos.preparando);
         loadPedidos(pedidos.pronto);
@@ -48,14 +45,13 @@
         } else {
             const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 2);
             const colNumber = Math.min(Math.ceil(pedido.length / numRow), 3);
-            console.log(colNumber)
             for (let i = 0; i < colNumber; i++) {
                 let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
                 let str = "";
                 for (let j = i * numRow; j < size; j++) {
                     const viagem = parseViagem(pedido[j]);
                     let numero = parseNumero(pedido[j])
-                    str += `<div class="h1 text-start">${viagem} ${numero}</div>`
+                    str += `<div class="h1 text-start ">${viagem} ${numero}</div>`
                 }
                 $("#pedidos").append(`<div class="col-sm-${smPedido}">${str}</div>`);
             }

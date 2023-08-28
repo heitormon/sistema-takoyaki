@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket } from 'net';
 
-@WebSocketGateway()
+@WebSocketGateway({cors: {origin:'*'}})
 export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   wss: Socket;
