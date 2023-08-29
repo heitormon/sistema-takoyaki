@@ -28,19 +28,21 @@
             $.ajax({
                 url: '/pedido',
                 data: JSON.stringify(pedido),
-                processData: false,
-                contentType: 'application/json',
                 type: 'POST',
+                contentType: 'application/json',
                 error: function (error) {
-                    console.log('Pedido ja registrado')
+                    $(`#numeroInput`).addClass('is-invalid');   
+                    alert('Pedido ja existente')
                 }, success: function (data) {
                     resolve(data)
+                    alert('Pedido enviado')
+                    window.location.reload();
                 }
             })
         })
     }
     function parseViagem(pedido) {
-        return pedido.viagem ? "🚗" : "🍽️";
+        return pedido.viagem ? "🚗" : "🥢";
     }
     function parseNumero(pedido) {
         return pedido.quantidade > 1 ? `${pedido.numero} - ${pedido.numero + pedido.quantidade - 1}` : `${pedido.numero}`;

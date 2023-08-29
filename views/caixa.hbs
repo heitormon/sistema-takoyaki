@@ -77,10 +77,9 @@
         Array.prototype.slice.call(forms)
             .forEach(function (form) {
                 form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    } else {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    if (form.checkValidity()) {
                         let numero = parseInt($('#numeroInput').val());
                         let viagem = document.querySelector('.form-check-input').checked;
                         let descricao = $('#descricaoInput').val();
@@ -89,7 +88,6 @@
                         let refeicao = $('#checkRefeicao').is(":checked");
                         sendPedido({ numero, viagem, descricao, quantidade, preferencial, refeicao })
                     }
-                    form.classList.add('was-validated')
                 }, false)
             })
     })()

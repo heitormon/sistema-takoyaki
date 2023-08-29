@@ -1,11 +1,4 @@
-import {
-  Get,
-  Controller,
-  Render,
-  Post,
-  Body,
-  Put,
-} from '@nestjs/common';
+import { Get, Controller, Render, Post, Body, Put } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PedidoDto } from './pedido.dto';
 
@@ -36,15 +29,15 @@ export class AppController {
     return this.appService.savePedido(pedido);
   }
   @Put('pedido/pronto')
-  pronto(@Body() pedido: {numero: number}) {
+  pronto(@Body() pedido: { numero: number }) {
     return this.appService.prontoPedido(pedido.numero);
   }
   @Put('pedido/cancelar')
-  cancelar(@Body() pedido:  {numero: number}) {
+  cancelar(@Body() pedido: { numero: number }) {
     return this.appService.cancelarPedido(pedido.numero);
   }
   @Put('pedido/finalizar')
-  finalizar(@Body() pedido:  {numero: number}) {
+  finalizar(@Body() pedido: { numero: number }) {
     return this.appService.finalizarPedido(pedido.numero);
   }
   @Get('pedidos')
