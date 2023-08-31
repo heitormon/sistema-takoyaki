@@ -8,21 +8,20 @@ export class AppController {
   @Get('painel')
   @Render('painel')
   painel() {
-    const pedidos = this.appService.readPedidos();
-    return {
-      pronto: JSON.stringify(pedidos.pronto),
-      preparando: JSON.stringify(pedidos.preparando),
-    };
+    const rowsNumber = process.env.ROWS_NUMBER || 6;
+    const colNumber = process.env.COL_NUMBER || 3;
+    return{
+      rowsNumber,
+      colNumber
+    }
   }
   @Get('caixa')
   @Render('caixa')
   caixa() {
-    return this.appService.readPedidos();
   }
   @Get('entrega')
   @Render('entrega')
   entrega() {
-    return this.appService.readPedidos();
   }
   @Post('pedido')
   pedido(@Body() pedido: PedidoDto) {

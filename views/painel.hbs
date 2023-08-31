@@ -63,12 +63,12 @@
     }
 
     function loadPedidos(pedido) {
-        const numRow = 6;
+        const numRow = {{rowsNumber}};
         if (pedido.length == 0) {
             $("#pedidos").append(`<div class="col-sm-6"></div>`);
         } else {
             const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 2);
-            const colNumber = Math.min(Math.ceil(pedido.length / numRow), 3);
+            const colNumber = Math.min(Math.ceil(pedido.length / numRow), {{colNumber}});
             for (let i = 0; i < colNumber; i++) {
                 let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
                 let str = "";
