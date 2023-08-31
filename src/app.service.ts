@@ -31,7 +31,7 @@ export class AppService {
       throw new BadRequestException('Pedido ja existente!!!');
     }
     this.add(data.preparando, pedido);
-    // this.appGateway.wss.emit('pedido', pedido);
+    this.appGateway.wss.emit('pedido', pedido);
   }
   readPedidos(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
     return data;

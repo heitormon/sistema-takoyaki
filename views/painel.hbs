@@ -9,6 +9,14 @@
         </div>
     </div>
 </div>
+<div class="modal" id="takoyakiSan" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body" id="takoyakiMessage">
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-sm-6">
         <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
@@ -24,12 +32,25 @@
     let localDate = new Date();
     socket.on('connection', e => load());
     socket.on('all', e => load());
+    socket.on('pedido', e => {
+        let min = Math.ceil(1);
+        let max = Math.floor(4);
+        const r = Math.floor(Math.random() * (max - min) + min);
+        const message = `<div class="alert alert-light} alert-dismissible" role="alert">
+                        <img src="/takoyakisan/${r}.png" class="rounded mx-auto d-block" alt="takoyaki baw">`;
+        $(`#takoyakiMessage`).children().remove();
+        $('#takoyakiMessage').append(`
+        <img src="/takoyakisan/${r}.png" class="rounded mx-auto d-block" alt="takoyaki baw">
+        `);
+        $('#takoyakiSan').modal('show');
+        setTimeout(() => { $('#takoyakiSan').modal('hide'); }, 2000);
+    })
     socket.on('pronto', data => {
         let numero = parseNumero(data);
         $(`#modalMessage`).children().remove();
         $('#modalMessage').append(`
         <div class="text-center" style="font-size:15vw;">${numero}</div>
-        <img src="/takoyakisan.png" class="rounded mx-auto d-block" alt="takoyaki baw">
+        <img src="/takoyakisan/arigatou.png" class="rounded mx-auto d-block" alt="takoyaki baw">
         `);
         $('#pedidoModal').modal('show');
         setTimeout(() => { $('#pedidoModal').modal('hide'); }, 5000);
