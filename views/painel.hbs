@@ -1,6 +1,6 @@
 <div class="modal top fade" id="pedidoModal">
     <div class="modal-dialog modal-fullscreen-xxl-down modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content bg-warning">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Pedido Pronto</h1>
             </div>
@@ -27,7 +27,10 @@
     socket.on('pronto', data => {
         let numero = parseNumero(data);
         $(`#modalMessage`).children().remove();
-        $('#modalMessage').append(`<div class="text-center" style="font-size:20vw;">${numero}</div>`);
+        $('#modalMessage').append(`
+        <div class="text-center" style="font-size:15vw;">${numero}</div>
+        <img src="/takoyakisan.png" class="rounded mx-auto d-block" alt="takoyaki baw">
+        `);
         $('#pedidoModal').modal('show');
         setTimeout(() => { $('#pedidoModal').modal('hide'); }, 5000);
     });

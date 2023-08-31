@@ -86,7 +86,7 @@
     function buildPreparando(pedido) {
         const viagem = parseViagem(pedido);
         const numero = parseNumero(pedido);
-        return `<div class="pedidos d-flex align-items-center bg-info">
+        return `<div class="pedidos border d-flex align-items-center bg-info">
                         <div class="col-1 fs-1 text-center">${numero}</div>
                         <div class="col-2 fs-1 text-center">${pedido.quantidade}</div>
                         <div class="col-1 fs-1 text-center bg-info">
@@ -102,7 +102,7 @@
     function buildPronto(pedido) {
         const viagem = parseViagem(pedido);
         const numero = parseNumero(pedido);
-        return `<div class="pedidos d-flex align-items-center bg-info">
+        return `<div class="pedidos border d-flex align-items-center bg-info">
                         <div class="col-2 fs-1 text-center bg-info">
                             ${viagem}
                         </div>
