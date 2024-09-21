@@ -1,7 +1,7 @@
 import { Get, Controller, Render, Post, Body, Put } from '@nestjs/common';
 import { AppService } from './app.service';
 import { PedidoDto } from './pedido.dto';
-
+var numeroPedido:number = 0;
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -18,6 +18,9 @@ export class AppController {
   @Get('caixa')
   @Render('caixa')
   caixa() {
+    return {
+      numeroPedido
+    };
   }
   @Get('entrega')
   @Render('entrega')
@@ -25,7 +28,9 @@ export class AppController {
   }
   @Post('pedido')
   pedido(@Body() pedido: PedidoDto) {
-    return this.appService.savePedido(pedido);
+    numeroPedido = pedido.numero;
+    this.appService.savePedido(pedido);
+    numeroPedido++;
   }
   @Put('pedido/pronto')
   pronto(@Body() pedido: { numero: number }) {

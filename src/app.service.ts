@@ -30,6 +30,11 @@ export class AppService {
     ) {
       throw new BadRequestException('Pedido ja existente!!!');
     }
+    if (
+      !Number.isInteger(numero)
+    ) {
+      throw new BadRequestException('Numero invalido');
+    }
     this.add(data.preparando, pedido);
     this.appGateway.wss.emit('pedido', pedido);
   }

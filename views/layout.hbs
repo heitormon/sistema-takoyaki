@@ -31,8 +31,9 @@
                 type: 'POST',
                 contentType: 'application/json',
                 error: function (error) {
+                    let message = error?.responseJSON?.message || 'Pedido ja existente'
                     $(`#numeroInput`).addClass('is-invalid');   
-                    alert('Pedido ja existente')
+                    alert(message)
                 }, success: function (data) {
                     resolve(data)
                     alert('Pedido enviado')
@@ -45,7 +46,7 @@
         return pedido.viagem ? "🚗" : "🥢";
     }
     function parseNumero(pedido) {
-        return pedido.quantidade > 1 ? `${pedido.numero} - ${pedido.numero + pedido.quantidade - 1}` : `${pedido.numero}`;
+        return pedido.numero;
     }
 </script>
 

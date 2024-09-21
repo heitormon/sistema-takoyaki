@@ -1,46 +1,46 @@
 <div class="container-fluid">
     <div class="row g-0">
-        <div class="col-8">
+        <div class="col-6">
             <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
         </div>
-        <div class="col-4">
+        <div class="col-6">
             <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
         </div>
     </div>
     <div class="row g-0 fs-6 text-center">
-        <div class="col-8 d-flex align-items-start bg-secondary">
-            <div class="col-1">
+        <div class="col-6 d-flex align-items-start bg-secondary">
+            <div class="col-2">
                 Pedido
             </div>
             <div class="col-2">
                 Quantidade
             </div>
-            <div class="col-1">
+            <div class="col-2">
                 Local
             </div>
-            <div class="col-2">
-                Preferêncial
-            </div>
-            <div class="col-1">
-                Refeição
-            </div>
-            <div class="col-2">
+            <div class="col-3">
                 Descrição
             </div>
         </div>
-        <div class="col-4 fs-6 d-flex align-items-center  bg-danger">
+        <div class="col-6 fs-6 d-flex align-items-center  bg-danger">
+           <div class="col-2">
+                Pedido
+            </div>
+            <div class="col-2">
+                Quantidade
+            </div>
             <div class="col-2">
                 Local
             </div>
-            <div class="col-4">
-                Pedido
+            <div class="col-3">
+                Descrição
             </div>
         </div>
     </div>
     <div class="row g-0">
-        <div class="col-8  text-center" id="preparando">
+        <div class="col-6  text-center" id="preparando">
         </div>
-        <div class="col-4  text-center" id="pronto">
+        <div class="col-6  text-center" id="pronto">
         </div>
     </div>
 </div>
@@ -87,13 +87,11 @@
         const viagem = parseViagem(pedido);
         const numero = parseNumero(pedido);
         return `<div class="pedidos border d-flex align-items-center bg-info">
-                        <div class="col-1 fs-1 text-center">${numero}</div>
+                        <div class="col-2 fs-1 text-center">${numero}</div>
                         <div class="col-2 fs-1 text-center">${pedido.quantidade}</div>
-                        <div class="col-1 fs-1 text-center bg-info">
+                        <div class="col-2 fs-1 text-center bg-info">
                             ${viagem}
                         </div>
-                        <div class="col-2 fs-1 text-center">${pedido.preferencial ? "🅿️" : "❌"}</div>
-                        <div class="col-1 fs-1 text-center">${pedido.refeicao ? "🍽️" : "❌"}</div>
                         <div class="col-3 fs-3 text-start">${pedido.descricao}</div>
                         <button type="button" onclick="update('pronto','${pedido.numero}')"
                             class="col-2 btn btn-success">pronto</button>
@@ -103,12 +101,14 @@
         const viagem = parseViagem(pedido);
         const numero = parseNumero(pedido);
         return `<div class="pedidos border d-flex align-items-center bg-info">
+                        <div class="col-2 fs-1 text-center">${numero}</div>
+                        <div class="col-2 fs-1 text-center">${pedido.quantidade}</div>
                         <div class="col-2 fs-1 text-center bg-info">
                             ${viagem}
                         </div>
-                        <div class="col-4 fs-1 text-center">${numero}</div>
+                        <div class="col-3 fs-3 text-start">${pedido.descricao}</div>
                         <button type="button" onclick="update('finalizar','${pedido.numero}')"
-                            class="col-sm-4 btn btn-success">finalizar</button>
+                            class="col-2 btn btn-success">finalizar</button>
                     </div>`
     }
 </script>

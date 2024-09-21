@@ -8,7 +8,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-6 mb-3">
                         <input type="tel" class="form-control form-control-lg" placeholder="Numero Pedido"
-                            id="numeroInput" autocomplete="off" required>
+                            id="numeroInput" autocomplete="off" value="{{numeroPedido}}" required>
                     </div>
                     <div class="col-md-4 mb-3">
                         <input type="tel" class="form-control form-control-lg" placeholder="Quantidade"
@@ -29,21 +29,13 @@
                         <label class="btn btn-outline-success" for="flexRadioDefault1">
                             <h1 class="display-5">Viagem</h1>
                         </label>
+                    </div>
+                    <div class="d-grid gap-2 col-6 mx-auto">
                         <input class="btn-check form-check-input" type="radio" name="flexRadioDefault"
                             id="flexRadioDefault2" value="false" checked>
                         <label class="btn btn-outline-success" for="flexRadioDefault2">
                             <h1 class="display-5">Comer Aqui</h1>
                         </label>
-                    </div>
-                    <div class="d-grid gap-2 col-6 mx-auto">
-                        <input type="checkbox" class="btn-check" id="checkPrefencial" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="checkPrefencial">
-                            <h1 class="display-5">Preferêncial</h1>
-                        </label>
-
-                        <input type="checkbox" class="btn-check" id="checkRefeicao" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="checkRefeicao">
-                            <h1 class="display-5">Vale Refeição</h1>
                     </div>
                 </div>
                 <div class="mt-auto p-2 row align-items-center">
@@ -84,9 +76,7 @@
                         let viagem = document.querySelector('.form-check-input').checked;
                         let descricao = $('#descricaoInput').val();
                         let quantidade = parseInt($('#quantidadeInput').val());
-                        let preferencial = $('#checkPrefencial').is(":checked");
-                        let refeicao = $('#checkRefeicao').is(":checked");
-                        sendPedido({ numero, viagem, descricao, quantidade, preferencial, refeicao })
+                        sendPedido({ numero, viagem, descricao, quantidade })
                     }
                 }, false)
             })
