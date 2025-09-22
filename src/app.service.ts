@@ -7,7 +7,7 @@ const data: { pronto: PedidoDto[]; preparando: PedidoDto[] } = readFile();
 
 @Injectable()
 export class AppService {
-  constructor(private readonly appGateway: AppGateway) {}
+  constructor(private readonly appGateway: AppGateway) { }
   finalizarPedido(pedido: number) {
     this.remove(data.pronto, pedido);
     this.appGateway.wss.emit('finaliza', { pedido });
@@ -43,7 +43,20 @@ export class AppService {
   }
   @Cron(CronExpression.EVERY_5_SECONDS)
   handleCron() {
-    fs.writeFileSync('./data/data.json', JSON.stringify(data));
+    let dataPath = './data/data.json';
+    let tempPath = './data/data.json.tmp';
+
+    try {
+      // Escreve em arquivo temporário primeiro
+      fs.writeFileSync(tempPath, JSON.stringify(data, null, 2));
+
+      // Move atomicamente o arquivo temporário para o destino
+      fs.renameSync(tempPath, dataPath);
+    } catch (error) {
+      console.error('Erro ao salvar arquivo:', error);
+      // Remove arquivo temporário se houver erro
+      fs.unlinkSync(tempPath);
+    }
   }
   private remove(list: PedidoDto[], pedido: number): void {
     for (var i = 0; i < list.length; i++) {
@@ -75,8 +88,17 @@ export class AppService {
 }
 function readFile(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
   if (fs.existsSync('./data/data.json')) {
-    const buffer = fs.readFileSync('./data/data.json');
-    return JSON.parse(buffer.toString());
+    try {
+      const buffer = fs.readFileSync('./data/data.json');
+      return JSON.parse(buffer.toString());
+    } catch (error) {
+      console.error("Falha ao carregar arquivo de backup")
+      return {
+        pronto: [],
+        preparando: [],
+      };
+    }
+
   } else {
     return {
       pronto: [],
