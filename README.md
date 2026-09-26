@@ -45,6 +45,30 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Running with Docker
+
+The application can be started with Docker Compose. The order data is mounted
+from the project's `data` directory, so `data/data.json` can be inspected or
+edited directly on the host.
+
+```bash
+# build the image and start the application
+docker compose up -d --build
+
+# follow application logs
+docker compose logs -f takoyaki
+
+# stop the application (the data directory is preserved)
+docker compose down
+```
+
+Open http://localhost:3000 after the container starts.
+
+When a GitHub Release is published, the workflow in
+`.github/workflows/publish.yaml` builds and publishes the image
+`heitormon/takoyaki` to Docker Hub. Configure the repository secrets
+`DOCKER_USERNAME` and `DOCKER_PASSWORD` before publishing a release.
+
 ## Test
 
 ```bash

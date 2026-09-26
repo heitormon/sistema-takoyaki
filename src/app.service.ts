@@ -2,8 +2,15 @@ import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PedidoDto } from './pedido.dto';
 import * as fs from 'fs';
+import * as path from 'path';
 import { AppGateway } from './app.gateway';
-const data: { pronto: PedidoDto[]; preparando: PedidoDto[] } = readFile();
+
+type DadosPedidos = { pronto: PedidoDto[]; preparando: PedidoDto[] };
+
+const DATA_DIR = path.resolve(process.cwd(), 'data');
+const DATA_PATH = path.join(DATA_DIR, 'data.json');
+const TEMP_PATH = path.join(DATA_DIR, 'data.json.tmp');
+const data: DadosPedidos = readFile();
 
 @Injectable()
 export class AppService {
@@ -41,21 +48,35 @@ export class AppService {
   readPedidos(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
     return data;
   }
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   handleCron() {
-    let dataPath = './data/data.json';
-    let tempPath = './data/data.json.tmp';
-
+    let tempFile: number | undefined;
     try {
-      // Escreve em arquivo temporário primeiro
-      fs.writeFileSync(tempPath, JSON.stringify(data, null, 2));
+      fs.mkdirSync(DATA_DIR, { recursive: true });
 
-      // Move atomicamente o arquivo temporário para o destino
-      fs.renameSync(tempPath, dataPath);
+      // A gravação ocorre fora do arquivo principal para que ele nunca fique pela metade.
+      tempFile = fs.openSync(TEMP_PATH, 'w');
+      fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf8');
+      fs.fsyncSync(tempFile);
+      fs.closeSync(tempFile);
+      tempFile = undefined;
+
+      // No mesmo volume, rename é atômico: o arquivo antigo permanece válido até a troca.
+      fs.renameSync(TEMP_PATH, DATA_PATH);
     } catch (error) {
       console.error('Erro ao salvar arquivo:', error);
-      // Remove arquivo temporário se houver erro
-      fs.unlinkSync(tempPath);
+      if (tempFile !== undefined) {
+        try {
+          fs.closeSync(tempFile);
+        } catch (_) {
+          // O erro original é o que deve ser reportado.
+        }
+      }
+      try {
+        fs.unlinkSync(TEMP_PATH);
+      } catch (_) {
+        // O temporário pode já ter sido renomeado ou não existir.
+      }
     }
   }
   private remove(list: PedidoDto[], pedido: number): void {
@@ -86,23 +107,24 @@ export class AppService {
     return index;
   }
 }
-function readFile(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
-  if (fs.existsSync('./data/data.json')) {
-    try {
-      const buffer = fs.readFileSync('./data/data.json');
-      return JSON.parse(buffer.toString());
-    } catch (error) {
-      console.error("Falha ao carregar arquivo de backup")
-      return {
-        pronto: [],
-        preparando: [],
-      };
+function readFile(): DadosPedidos {
+  try {
+    const parsed: unknown = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));
+    if (isDadosPedidos(parsed)) {
+      return parsed;
     }
-
-  } else {
-    return {
-      pronto: [],
-      preparando: [],
-    };
+    throw new Error('estrutura de dados inválida');
+  } catch (error) {
+    console.error('Falha ao carregar arquivo de backup; iniciando vazio:', error);
+    return { pronto: [], preparando: [] };
   }
+}
+
+function isDadosPedidos(value: unknown): value is DadosPedidos {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const dados = value as { pronto?: unknown; preparando?: unknown };
+  return Array.isArray(dados.pronto) && Array.isArray(dados.preparando);
 }
