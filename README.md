@@ -1,30 +1,8 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+## Sistema Takoyaki
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Sistema de gerenciamento de pedidos para operação de Takoyaki, com telas de
+painel, caixa e entrega em tempo real.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 
@@ -47,33 +25,100 @@ $ npm run start:prod
 
 ## Running with Docker
 
-The application can be started with Docker Compose. The order data is mounted
-from the project's `data` directory, so `data/data.json` can be inspected or
-edited directly on the host.
+### Prerequisites
+
+- Docker Engine or Docker Desktop installed and running.
+- Docker Compose v2 (`docker compose`).
+- A `data` directory in the project. It stores `data.json` outside the
+  container.
+
+Create the data directory before starting:
 
 ```bash
-# build the image and start the application
-docker compose up -d --build
-
-# follow application logs
-docker compose logs -f takoyaki
-
-# stop the application (the data directory is preserved)
-docker compose down
+mkdir -p data
 ```
 
-Open http://localhost:3000 after the container starts.
+The synchronization interval is configured with
+`DATA_SYNC_INTERVAL_SECONDS`. The default is `60` seconds.
 
-The data synchronization JOB runs every 60 seconds by default. Its interval can
-be changed with the `DATA_SYNC_INTERVAL_SECONDS` environment variable. For
-example, to synchronize every 5 minutes:
+### Local build with Docker Compose
 
-```bash
-DATA_SYNC_INTERVAL_SECONDS=300 docker compose up -d
-```
+This option builds the image from the current project files. Use it when
+developing or when you want to run the current local code.
 
-The JOB logs its start, completion time, item counts, and errors without
-printing the order contents.
+1. From the project root, create the data directory:
+
+   ```bash
+   mkdir -p data
+   ```
+
+2. Build and start the application:
+
+   ```bash
+   DATA_SYNC_INTERVAL_SECONDS=10 docker compose up -d --build --force-recreate
+   ```
+
+3. Follow the application logs:
+
+   ```bash
+   docker compose logs -f takoyaki
+   ```
+
+4. Open the application at [http://localhost:3000/painel](http://localhost:3000/painel).
+
+5. Stop the application while preserving the data directory:
+
+   ```bash
+   docker compose down
+   ```
+
+The Compose configuration mounts `./data` to `/app/data`, so the orders are
+available at `data/data.json` on the host.
+
+### Run the published image
+
+Use this option to run a released image from Docker Hub without building the
+project locally.
+
+1. From the project root, create the data directory:
+
+   ```bash
+   mkdir -p data
+   ```
+
+2. Download the published image:
+
+   ```bash
+   docker pull heitormon/takoyaki:v4.0.1
+   ```
+
+3. Start the container with a 10-second synchronization interval:
+
+   ```bash
+   docker run -d \
+     --name takoyaki \
+     --restart unless-stopped \
+     -p 3000:3000 \
+     -e DATA_SYNC_INTERVAL_SECONDS=10 \
+     -v "$(pwd)/data:/app/data" \
+     heitormon/takoyaki:v4.0.1
+   ```
+
+4. Follow the application logs:
+
+   ```bash
+   docker logs -f takoyaki
+   ```
+
+5. Stop and remove the container when needed:
+
+   ```bash
+   docker stop takoyaki
+   docker rm takoyaki
+   ```
+
+Open [http://localhost:3000/painel](http://localhost:3000/painel). The order
+file remains available at `data/data.json` on the host.
 
 When a GitHub Release is published, the workflow in
 `.github/workflows/publish.yaml` builds and publishes the image
@@ -92,17 +137,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
