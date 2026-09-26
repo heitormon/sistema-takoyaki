@@ -64,6 +64,17 @@ docker compose down
 
 Open http://localhost:3000 after the container starts.
 
+The data synchronization JOB runs every 60 seconds by default. Its interval can
+be changed with the `DATA_SYNC_INTERVAL_SECONDS` environment variable. For
+example, to synchronize every 5 minutes:
+
+```bash
+DATA_SYNC_INTERVAL_SECONDS=300 docker compose up -d
+```
+
+The JOB logs its start, completion time, item counts, and errors without
+printing the order contents.
+
 When a GitHub Release is published, the workflow in
 `.github/workflows/publish.yaml` builds and publishes the image
 `heitormon/takoyaki` to Docker Hub. Configure the repository secrets

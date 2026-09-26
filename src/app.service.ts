@@ -1,5 +1,5 @@
 import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Interval } from '@nestjs/schedule';
 import { PedidoDto } from './pedido.dto';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -10,6 +10,7 @@ type DadosPedidos = { pronto: PedidoDto[]; preparando: PedidoDto[] };
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DATA_PATH = path.join(DATA_DIR, 'data.json');
 const TEMP_PATH = path.join(DATA_DIR, 'data.json.tmp');
+const DATA_SYNC_INTERVAL_SECONDS = getSyncIntervalSeconds();
 const data: DadosPedidos = readFile();
 
 @Injectable()
@@ -48,9 +49,11 @@ export class AppService {
   readPedidos(): { pronto: PedidoDto[]; preparando: PedidoDto[] } {
     return data;
   }
-  @Cron(CronExpression.EVERY_MINUTE)
-  handleCron() {
+  @Interval(DATA_SYNC_INTERVAL_SECONDS * 1000)
+  handleDataSync() {
     let tempFile: number | undefined;
+    const startedAt = Date.now();
+    console.log(`[data-sync] Iniciando sincronizacao para ${DATA_PATH}`);
     try {
       fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -63,8 +66,12 @@ export class AppService {
 
       // No mesmo volume, rename é atômico: o arquivo antigo permanece válido até a troca.
       fs.renameSync(TEMP_PATH, DATA_PATH);
+      console.log(
+        `[data-sync] Sincronizacao concluida em ${Date.now() - startedAt}ms ` +
+        `(${data.preparando.length} preparando, ${data.pronto.length} prontos)`,
+      );
     } catch (error) {
-      console.error('Erro ao salvar arquivo:', error);
+      console.error(`[data-sync] Erro ao salvar ${DATA_PATH}:`, error);
       if (tempFile !== undefined) {
         try {
           fs.closeSync(tempFile);
@@ -107,6 +114,14 @@ export class AppService {
     return index;
   }
 }
+
+function getSyncIntervalSeconds(): number {
+  const configuredInterval = Number(process.env.DATA_SYNC_INTERVAL_SECONDS);
+  return Number.isInteger(configuredInterval) && configuredInterval > 0
+    ? configuredInterval
+    : 60;
+}
+
 function readFile(): DadosPedidos {
   try {
     const parsed: unknown = JSON.parse(fs.readFileSync(DATA_PATH, 'utf8'));

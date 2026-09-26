@@ -5,6 +5,8 @@ services:
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+    environment:
+      DATA_SYNC_INTERVAL_SECONDS: "${DATA_SYNC_INTERVAL_SECONDS:-10}"
     volumes:
       - ./data:/app/data
     restart: unless-stopped
