@@ -46,6 +46,7 @@
         element.removeClass('d-none alert-success alert-danger').addClass(`alert-${type}`).text(message);
     }
     function sendPedido(pedido) {
+        $('#enviarButton').prop('disabled', true);
         new Promise((resolve) => {
             $.ajax({
                 url: '/pedido',
@@ -56,6 +57,7 @@
                     let message = error?.responseJSON?.message || 'Não foi possível enviar o pedido.';
                     $(`#numeroInput`).addClass('is-invalid');
                     showFormMessage(message, 'danger');
+                    $('#enviarButton').prop('disabled', false);
                 }, success: function (data) {
                     resolve(data)
                     showFormMessage(`Pedido ${pedido.numero} enviado para a cozinha.`, 'success');
@@ -63,6 +65,7 @@
                     $('#quantidadeInput').val('1');
                     $('#numeroInput').val(Number(pedido.numero) + 1).removeClass('is-invalid').trigger('focus');
                     $('.needs-validation').removeClass('was-validated');
+                    $('#enviarButton').prop('disabled', false);
                     if (typeof load === 'function') load();
                 }
             })

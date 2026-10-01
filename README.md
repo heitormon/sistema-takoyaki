@@ -41,6 +41,13 @@ mkdir -p data
 The synchronization interval is configured with
 `DATA_SYNC_INTERVAL_SECONDS`. The default is `60` seconds.
 
+When running with Docker, set `PUBLIC_HOST` to the computer's Wi-Fi IP if you
+want the startup log to print URLs accessible by other devices on the network:
+
+```bash
+PUBLIC_HOST=192.168.18.14 docker compose up -d --build
+```
+
 ### Local build with Docker Compose
 
 This option builds the image from the current project files. Use it when

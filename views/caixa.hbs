@@ -56,13 +56,17 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label visually-hidden" for="numeroInput">Número do pedido</label>
                         <input type="number" min="0" step="1" class="form-control form-control-lg" placeholder="Número do pedido"
-                            id="numeroInput" autocomplete="off" value="{{numeroPedido}}" required>
+                            id="numeroInput" autocomplete="off" value="{{numeroPedido}}" autofocus required>
                         <div class="invalid-feedback">Informe um número de pedido válido.</div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label visually-hidden" for="quantidadeInput">Quantidade</label>
-                        <input type="number" min="1" step="1" class="form-control form-control-lg" placeholder="Quantidade"
-                            id="quantidadeInput" autocomplete="off" value="1" required>
+                        <div class="input-group input-group-lg">
+                            <button type="button" class="btn btn-outline-secondary" id="menosQuantidade" aria-label="Diminuir quantidade" title="Diminuir quantidade">−</button>
+                            <input type="number" min="1" step="1" class="form-control form-control-lg text-center" placeholder="Quantidade"
+                                id="quantidadeInput" autocomplete="off" value="1" required>
+                            <button type="button" class="btn btn-outline-secondary" id="maisQuantidade" aria-label="Aumentar quantidade" title="Aumentar quantidade">+</button>
+                        </div>
                         <div class="invalid-feedback">Informe uma quantidade maior que zero.</div>
                     </div>
                     <div class="col-md-12 mb-3">
@@ -122,12 +126,25 @@
     socket.on('connection', data => load());
     socket.on('all', data => load());
     (function () {
+        $('#menosQuantidade').on('click', function () {
+            const quantidade = Math.max(1, Number($('#quantidadeInput').val()) - 1);
+            $('#quantidadeInput').val(quantidade).trigger('change');
+        });
+        $('#maisQuantidade').on('click', function () {
+            const quantidade = Math.max(1, Number($('#quantidadeInput').val()) + 1);
+            $('#quantidadeInput').val(quantidade).trigger('change');
+        });
+
         var forms = document.querySelectorAll('.needs-validation')
         Array.prototype.slice.call(forms)
             .forEach(function (form) {
                 form.addEventListener('submit', function (event) {
                     event.preventDefault()
                     event.stopPropagation()
+                    if (!socket.connected) {
+                        showFormMessage('Sem conexão com a cozinha. Aguarde a conexão voltar.', 'danger');
+                        return;
+                    }
                     if (form.checkValidity() && Number($('#quantidadeInput').val()) > 0) {
                         let numero = parseInt($('#numeroInput').val());
                         let viagem = document.querySelector('input[name="flexRadioDefault"]:checked').value === 'true';

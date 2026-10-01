@@ -24,16 +24,9 @@
         <div class="modal-content bg-warning">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="exampleModalLabel">Pedido Pronto</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body" id="modalMessage">
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal" id="takoyakiSan" data-bs-backdrop="false">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body" id="takoyakiMessage">
             </div>
         </div>
     </div>
@@ -55,28 +48,16 @@
     socket.on('connect', () => updateConnectionIndicator('online'));
     socket.on('disconnect', () => updateConnectionIndicator('offline'));
     socket.on('connect_error', () => updateConnectionIndicator('offline'));
-    let localDate = new Date();
     socket.on('connection', e => load());
     socket.on('all', e => load());
-    socket.on('pedido', e => {
-        let min = Math.ceil(1);
-        let max = Math.floor(4);
-        const r = Math.floor(Math.random() * (max - min) + min);
-        const message = `<div class="alert alert-light} alert-dismissible" role="alert">
-                        <img src="/takoyakisan/${r}.png" class="rounded mx-auto d-block" alt="takoyaki baw">`;
-        $(`#takoyakiMessage`).children().remove();
-        $('#takoyakiMessage').append(`
-        <img src="/takoyakisan/${r}.png" class="rounded mx-auto d-block" alt="takoyaki baw">
-        `);
-        $('#takoyakiSan').modal('show');
-        setTimeout(() => { $('#takoyakiSan').modal('hide'); }, 2000);
-    })
     socket.on('pronto', data => {
         let numero = parseNumero(data);
+        const imagens = ['/takoyakisan/1.png', '/takoyakisan/2.png', '/takoyakisan/3.png'];
+        const imagem = imagens[Math.floor(Math.random() * imagens.length)];
         $(`#modalMessage`).children().remove();
         $('#modalMessage').append(`
         <div class="text-center" style="font-size:15vw;">${numero}</div>
-        <img src="/takoyakisan/arigatou.png" class="rounded mx-auto d-block" alt="takoyaki baw">
+        <img src="${imagem}" class="rounded mx-auto d-block" alt="Pedido pronto">
         `);
         $('#pedidoModal').modal('show');
         setTimeout(() => { $('#pedidoModal').modal('hide'); }, 5000);

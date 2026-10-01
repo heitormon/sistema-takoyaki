@@ -10,6 +10,7 @@
     .entrega-page .pedido-acao {
         min-height: 3.25rem;
         font-size: 1.1rem;
+        font-weight: 600;
     }
 
     @media (max-width: 767.98px) {
@@ -67,12 +68,18 @@
 </div>
 <script>
     const socket = io();
+    const pendingUpdates = new Set();
     socket.on('connect', () => updateConnectionIndicator('online'));
     socket.on('disconnect', () => updateConnectionIndicator('offline'));
     socket.on('connect_error', () => updateConnectionIndicator('offline'));
     socket.on('connection', data => load());
     socket.on('all', data => load());
-    function update(action, pedido) {
+    function update(action, pedido, button) {
+        const updateKey = `${action}:${pedido}`;
+        if (pendingUpdates.has(updateKey)) return;
+        pendingUpdates.add(updateKey);
+        const $button = $(button);
+        $button.prop('disabled', true).text('Atualizando...');
         $.ajax({
             url: `/pedido/${action}`,
             processData: false,
@@ -84,6 +91,9 @@
             load();
         }).fail(function () {
             showEntregaMessage('Não foi possível atualizar o pedido.', 'danger');
+        }).always(function () {
+            pendingUpdates.delete(updateKey);
+            $button.prop('disabled', false).text(action === 'pronto' ? 'Marcar pronto' : 'Finalizar');
         });
     }
     async function load() {
@@ -127,7 +137,7 @@
                             ${viagem}<small class="d-block fs-6">${local}</small>
                         </div>
                         <div class="col-3 fs-5 text-start">${escapeHtml(pedido.descricao) || 'Sem descrição'}</div>
-                        <button type="button" onclick="update('pronto','${pedido.numero}')"
+                        <button type="button" aria-label="Marcar pedido ${numero} como pronto" onclick="update('pronto','${pedido.numero}', this)"
                             class="col-2 btn btn-success pedido-acao">Marcar pronto</button>
                     </div>`
     }
@@ -142,8 +152,8 @@
                             ${viagem}<small class="d-block fs-6">${local}</small>
                         </div>
                         <div class="col-3 fs-5 text-start">${escapeHtml(pedido.descricao) || 'Sem descrição'}</div>
-                        <button type="button" onclick="update('finalizar','${pedido.numero}')"
-                            class="col-2 btn btn-success pedido-acao">Finalizar</button>
+                        <button type="button" aria-label="Finalizar pedido ${numero}" onclick="update('finalizar','${pedido.numero}', this)"
+                            class="col-2 btn btn-primary pedido-acao">Finalizar</button>
                     </div>`
     }
 
