@@ -117,7 +117,7 @@ project locally.
    docker run -d \
      --name takoyaki \
      --restart unless-stopped \
-     -p 3000:3000 \
+     -p 8080:3000 \
      -e DATA_SYNC_INTERVAL_SECONDS=10 \
      -v "$(pwd)/data:/app/data" \
      heitormon/takoyaki:v4.0.1
@@ -136,13 +136,44 @@ project locally.
    docker rm takoyaki
    ```
 
-Open [http://localhost:3000/painel](http://localhost:3000/painel). The order
+Open [http://localhost:8080/painel](http://localhost:8080/painel). The order
 file remains available at `data/data.json` on the host.
 
 When a GitHub Release is published, the workflow in
 `.github/workflows/publish.yaml` builds and publishes the image
 `heitormon/takoyaki` to Docker Hub. Configure the repository secrets
 `DOCKER_USERNAME` and `DOCKER_PASSWORD` before publishing a release.
+
+### Local server with Pi-hole DNS
+
+For a local server where `takoyaki.com` should resolve to the server, use the
+local Compose file. The application is exposed on port `80` and the Pi-hole
+administration panel is exposed on port `8081`.
+
+1. Create the data directory and set a Pi-hole password:
+
+   ```bash
+   mkdir -p data
+   export PIHOLE_PASSWORD='change-this-password'
+   ```
+
+2. Start the stack:
+
+   ```bash
+   docker compose -f docker-compose.local.yml up -d
+   ```
+
+3. Open the Pi-hole panel at `http://SERVER_IP:8081/admin` and add a local
+   DNS record mapping `takoyaki.com` to the server IP.
+
+4. Configure the devices or router to use the server IP as their DNS server.
+   The application will then be available at `http://takoyaki.com/painel`.
+
+Stop the stack with:
+
+```bash
+docker compose -f docker-compose.local.yml down
+```
 
 ## Test
 
