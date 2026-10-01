@@ -1,0 +1,15 @@
+services:
+  takoyaki:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: build
+    command: npm run start:dev
+    ports:
+      - "3000:3000"
+    environment:
+      DATA_SYNC_INTERVAL_SECONDS: "${DATA_SYNC_INTERVAL_SECONDS:-60}"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./data:/app/data

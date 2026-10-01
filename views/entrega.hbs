@@ -1,19 +1,39 @@
-<div class="container-fluid">
+<style>
+    .entrega-page .entrega-coluna {
+        min-height: 12rem;
+    }
+
+    .entrega-page .pedido-linha {
+        min-height: 5.5rem;
+    }
+
+    .entrega-page .pedido-acao {
+        min-height: 3.25rem;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .entrega-page .entrega-coluna {
+            min-height: 8rem;
+        }
+    }
+</style>
+<div class="container-fluid entrega-page">
     <div class="row g-0">
         <div class="col-6">
-            <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
+            <div class="fs-1 text-start bg-secondary text-white px-2 py-2">🐙 Preparando <span class="badge bg-light text-dark">Pedidos <span id="preparandoPedidosTotal">0</span></span> <span class="badge bg-light text-dark">Porções <span id="preparandoPorcoesTotal">0</span></span></div>
         </div>
         <div class="col-6">
-            <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
+            <div class="fs-1 text-start bg-danger text-white px-2 py-2">😋 Pronto</div>
         </div>
     </div>
     <div class="row g-0 fs-6 text-center">
         <div class="col-6 d-flex align-items-start bg-secondary">
             <div class="col-2">
-                Pedido
+                Pedidos
             </div>
             <div class="col-2">
-                Quantidade
+                Porções
             </div>
             <div class="col-2">
                 Local
@@ -24,10 +44,10 @@
         </div>
         <div class="col-6 fs-6 d-flex align-items-center  bg-danger">
            <div class="col-2">
-                Pedido
+                Pedidos
             </div>
             <div class="col-2">
-                Quantidade
+                Porções
             </div>
             <div class="col-2">
                 Local
@@ -38,14 +58,18 @@
         </div>
     </div>
     <div class="row g-0">
-        <div class="col-6  text-center" id="preparando">
+        <div class="col-6 text-center entrega-coluna" id="preparando">
         </div>
-        <div class="col-6  text-center" id="pronto">
+        <div class="col-6 text-center entrega-coluna" id="pronto">
         </div>
     </div>
+    <div id="entregaMessage" class="alert d-none mt-2" role="status" aria-live="polite"></div>
 </div>
 <script>
     const socket = io();
+    socket.on('connect', () => updateConnectionIndicator('online'));
+    socket.on('disconnect', () => updateConnectionIndicator('offline'));
+    socket.on('connect_error', () => updateConnectionIndicator('offline'));
     socket.on('connection', data => load());
     socket.on('all', data => load());
     function update(action, pedido) {
@@ -56,7 +80,11 @@
             data: JSON.stringify({ numero: pedido }),
             processData: false,
             contentType: 'application/json',
-        })
+        }).done(function () {
+            load();
+        }).fail(function () {
+            showEntregaMessage('Não foi possível atualizar o pedido.', 'danger');
+        });
     }
     async function load() {
         const pedidos = await fetchPedidos();
@@ -67,9 +95,14 @@
         loadPedidos(data.preparando, 'preparando')
     }
     function loadPedidos(pedidos, tipo) {
+        const totalPorcoes = pedidos.reduce((total, pedido) => total + (Number(pedido.quantidade) || 0), 0);
+        if (tipo === 'preparando') {
+            $('#preparandoPedidosTotal').text(pedidos.length);
+            $('#preparandoPorcoesTotal').text(totalPorcoes);
+        }
         $(`#${tipo}`).children().remove();
         if (pedidos.length == 0) {
-            $(`#${tipo}`).append(`<div class="col-sm-6"></div>`);
+            $(`#${tipo}`).append(`<div class="py-4 text-muted">Nenhum pedido nesta etapa.</div>`);
         } else {
             for (let i = 0; i < pedidos.length; i++) {
                 let pedido = pedidos[i]
@@ -85,30 +118,40 @@
     }
     function buildPreparando(pedido) {
         const viagem = parseViagem(pedido);
+        const local = pedido.viagem ? 'Viagem' : 'Comer aqui';
         const numero = parseNumero(pedido);
-        return `<div class="pedidos border d-flex align-items-center bg-info">
+        return `<div class="pedidos pedido-linha border d-flex align-items-center bg-info">
                         <div class="col-2 fs-1 text-center">${numero}</div>
-                        <div class="col-2 fs-1 text-center">${pedido.quantidade}</div>
-                        <div class="col-2 fs-1 text-center bg-info">
-                            ${viagem}
+                        <div class="col-2 fs-4 text-center"><strong>${pedido.quantidade}</strong><small class="d-block fs-6">porções</small></div>
+                        <div class="col-2 fs-4 text-center bg-info">
+                            ${viagem}<small class="d-block fs-6">${local}</small>
                         </div>
-                        <div class="col-3 fs-3 text-start">${pedido.descricao}</div>
+                        <div class="col-3 fs-5 text-start">${escapeHtml(pedido.descricao) || 'Sem descrição'}</div>
                         <button type="button" onclick="update('pronto','${pedido.numero}')"
-                            class="col-2 btn btn-success">pronto</button>
+                            class="col-2 btn btn-success pedido-acao">Marcar pronto</button>
                     </div>`
     }
     function buildPronto(pedido) {
         const viagem = parseViagem(pedido);
+        const local = pedido.viagem ? 'Viagem' : 'Comer aqui';
         const numero = parseNumero(pedido);
-        return `<div class="pedidos border d-flex align-items-center bg-info">
+        return `<div class="pedidos pedido-linha border d-flex align-items-center bg-info">
                         <div class="col-2 fs-1 text-center">${numero}</div>
                         <div class="col-2 fs-1 text-center">${pedido.quantidade}</div>
-                        <div class="col-2 fs-1 text-center bg-info">
-                            ${viagem}
+                        <div class="col-2 fs-4 text-center bg-info">
+                            ${viagem}<small class="d-block fs-6">${local}</small>
                         </div>
-                        <div class="col-3 fs-3 text-start">${pedido.descricao}</div>
+                        <div class="col-3 fs-5 text-start">${escapeHtml(pedido.descricao) || 'Sem descrição'}</div>
                         <button type="button" onclick="update('finalizar','${pedido.numero}')"
-                            class="col-2 btn btn-success">finalizar</button>
+                            class="col-2 btn btn-success pedido-acao">Finalizar</button>
                     </div>`
+    }
+
+    function showEntregaMessage(message, type) {
+        $('#entregaMessage').removeClass('d-none alert-success alert-danger').addClass(`alert-${type}`).text(message);
+    }
+
+    function escapeHtml(value) {
+        return $('<div>').text(value || '').html();
     }
 </script>

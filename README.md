@@ -75,6 +75,25 @@ developing or when you want to run the current local code.
 The Compose configuration mounts `./data` to `/app/data`, so the orders are
 available at `data/data.json` on the host.
 
+### Local development with automatic reload
+
+For development, use the development Compose file. It mounts the project into
+the container and runs NestJS in watch mode, so source changes are reloaded
+without rebuilding the image.
+
+```bash
+DATA_SYNC_INTERVAL_SECONDS=60 docker compose -f docker-compose.dev.yml up --build
+```
+
+Stop it with `Ctrl+C`, or run:
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+This mode is intended for local development. Use the regular Compose file or
+the published image for a production-like deployment.
+
 ### Run the published image
 
 Use this option to run a released image from Docker Hub without building the

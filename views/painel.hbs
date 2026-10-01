@@ -1,3 +1,24 @@
+<style>
+    .painel-page .painel-coluna {
+        min-height: 14rem;
+    }
+    .painel-page .painel-cabecalho {
+        min-height: 4.5rem;
+    }
+    .painel-page .pedido-numero {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        line-height: 1.1;
+    }
+    @media (max-width: 767.98px) {
+        .painel-page .painel-coluna {
+            min-height: 10rem;
+        }
+        .painel-page .painel-cabecalho {
+            min-height: 3.5rem;
+            font-size: 1.5rem !important;
+        }
+    }
+</style>
 <div class="modal top fade" id="pedidoModal">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content bg-warning">
@@ -17,18 +38,23 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-sm-6">
-        <div class="fs-1 text-start bg-secondary text-white">🐙 Preparando</div>
+<div class="painel-page">
+<div class="row g-1">
+    <div class="col-6">
+        <div class="fs-1 text-start bg-secondary text-white px-2 py-2 painel-cabecalho">🐙 Preparando <span id="preparandoCount" class="badge bg-light text-dark">0</span></div>
     </div>
-    <div class="col-sm-6">
-        <div class="fs-1 text-start bg-danger text-white">😋 Pronto</div>
+    <div class="col-6">
+        <div class="fs-1 text-start bg-danger text-white px-2 py-2 painel-cabecalho">😋 Pronto <span id="prontoCount" class="badge bg-light text-dark">0</span></div>
     </div>
 </div>
 <div class="row" id="pedidos">
 </div>
+</div>
 <script>
     const socket = io();
+    socket.on('connect', () => updateConnectionIndicator('online'));
+    socket.on('disconnect', () => updateConnectionIndicator('offline'));
+    socket.on('connect_error', () => updateConnectionIndicator('offline'));
     let localDate = new Date();
     socket.on('connection', e => load());
     socket.on('all', e => load());
@@ -58,14 +84,16 @@
     async function load() {
         const pedidos = await fetchPedidos();
         $(`#pedidos`).children().remove();
-        loadPedidos(pedidos.preparando);
-        loadPedidos(pedidos.pronto);
+        $('#preparandoCount').text(pedidos.preparando.length);
+        $('#prontoCount').text(pedidos.pronto.length);
+        loadPedidos(pedidos.preparando, 'preparando');
+        loadPedidos(pedidos.pronto, 'pronto');
     }
 
-    function loadPedidos(pedido) {
+    function loadPedidos(pedido, tipo) {
         const numRow = {{rowsNumber}};
         if (pedido.length == 0) {
-            $("#pedidos").append(`<div class="col-sm-6"></div>`);
+            $("#pedidos").append(`<div class="col-6 painel-coluna d-flex align-items-center justify-content-center text-muted fs-4">Nenhum pedido</div>`);
         } else {
             const smPedido = Math.max(Math.floor(6 / Math.ceil(pedido.length / numRow)), 2);
             const colNumber = Math.min(Math.ceil(pedido.length / numRow), {{colNumber}});
@@ -73,11 +101,10 @@
                 let size = i + 1 == colNumber ? pedido.length : (i + 1) * numRow;
                 let str = "";
                 for (let j = i * numRow; j < size; j++) {
-                    const viagem = parseViagem(pedido[j]);
-                    let numero = parseNumero(pedido[j])
-                    str += `<div class="h1 text-start ">${viagem} ${numero}</div>`
+                    let numero = parseNumero(pedido[j]);
+                    str += `<div class="pedido-numero text-start border-bottom py-2">${numero}</div>`
                 }
-                $("#pedidos").append(`<div class="col-sm-${smPedido}">${str}</div>`);
+                $("#pedidos").append(`<div class="col-6 col-md-${smPedido} painel-coluna px-3">${str}</div>`);
             }
         }
 
