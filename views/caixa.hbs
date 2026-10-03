@@ -43,6 +43,12 @@
             font-size: 1rem;
         }
     }
+
+    .caixa-page .btn-check:checked + .btn-outline-success {
+        color: #fff;
+        background-color: var(--bs-success);
+        border-color: var(--bs-success);
+    }
 </style>
 <div class="container-fluid py-3 caixa-page">
     <div class="p-3 card text-center">
@@ -77,19 +83,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="row align-items-center">
+                <div class="row align-items-center" role="group" aria-label="Tipo do pedido">
                     <div class="d-grid gap-2 col-12 col-md-6 mx-auto mb-2 mb-md-0">
                         <input class="btn-check form-check-input" type="radio" name="flexRadioDefault"
-                            id="flexRadioDefault1" value="true">
-                        <label class="btn btn-success py-3" for="flexRadioDefault1">
-                            <span class="fs-2">🚗 Viagem</span>
+                            id="flexRadioDefault1" value="false" checked>
+                        <label class="btn btn-outline-success py-3" for="flexRadioDefault1">
+                            <span class="fs-2">🥢 Comer Aqui</span>
                         </label>
                     </div>
                     <div class="d-grid gap-2 col-12 col-md-6 mx-auto">
                         <input class="btn-check form-check-input" type="radio" name="flexRadioDefault"
-                            id="flexRadioDefault2" value="false" checked>
-                        <label class="btn btn-success py-3" for="flexRadioDefault2">
-                            <span class="fs-2">🥢 Comer Aqui</span>
+                            id="flexRadioDefault2" value="true">
+                        <label class="btn btn-outline-success py-3" for="flexRadioDefault2">
+                            <span class="fs-2">🚗 Viagem</span>
                         </label>
                     </div>
                 </div>
